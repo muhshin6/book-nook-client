@@ -3,7 +3,7 @@
 import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 
 interface Slide {
   overline: string;
@@ -47,24 +47,30 @@ const slides: Slide[] = [
 export function Banner() {
   const [currentSlide, setCurrentSlide] = React.useState(0);
   const [isPaused, setIsPaused] = React.useState(false);
+  const prefersReducedMotion = useReducedMotion();
+  const shouldAutoAdvance = !isPaused && !prefersReducedMotion;
 
   React.useEffect(() => {
-    if (isPaused) return;
+    if (!shouldAutoAdvance) return;
 
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
     }, 7000);
 
     return () => clearInterval(timer);
-  }, [isPaused]);
+  }, [shouldAutoAdvance]);
 
   const slide = slides[currentSlide];
 
   return (
     <section
+      aria-roledescription="carousel"
+      aria-label="Featured book themes"
       className="relative min-h-[calc(80vh-2rem)] flex items-center overflow-hidden bg-[#f4f7f4] dark:bg-[#0a110e]"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
+      onFocusCapture={() => setIsPaused(true)}
+      onBlurCapture={() => setIsPaused(false)}
     >
       <AnimatePresence initial={false} mode="sync">
         <motion.div
@@ -73,7 +79,7 @@ export function Banner() {
           animate={{ x: "0%" }}
           exit={{ x: "-100%" }}
           transition={{
-            duration: 0.8,
+            duration: prefersReducedMotion ? 0 : 0.8,
             ease: "easeInOut",
           }}
           className="absolute inset-0"
@@ -137,6 +143,7 @@ export function Banner() {
             type="button"
             onClick={() => setCurrentSlide(index)}
             aria-label={`Go to slide ${index + 1}`}
+            aria-current={index === currentSlide ? "true" : undefined}
             className={`rounded-full transition-all duration-300 focus:outline-none ${
               index === currentSlide
                 ? "w-2.5 h-2.5 bg-[#ea580c] ring-2 ring-[#ea580c]/30"
