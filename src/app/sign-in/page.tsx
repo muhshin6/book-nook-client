@@ -1,0 +1,64 @@
+import * as React from "react";
+import type { Metadata } from "next";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
+
+import { AuthShell } from "@/components/auth/auth-shell";
+import { auth, isGoogleAuthEnabled } from "@/lib/auth";
+import { getSafeNextPath } from "@/lib/redirect";
+import { SignInForm } from "./sign-in-form";
+
+export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Sign In",
+};
+
+interface SignInPageProps {
+  searchParams: Promise<{
+    next?: string | string[];
+    error?: string | string[];
+    error_description?: string | string[];
+    error_code?: string | string[];
+  }>;
+}
+
+export default async function SignInPage({ searchParams }: SignInPageProps) {
+  const params = await searchParams;
+  const nextParam = Array.isArray(params.next) ? params.next[0] : params.next;
+  const errorParam = Array.isArray(params.error) ? params.error[0] : params.error;
+  const errorDescription = Array.isArray(params.error_description)
+    ? params.error_description[0]
+    : params.error_description;
+  const errorCode = Array.isArray(params.error_code)
+    ? params.error_code[0]
+    : params.error_code;
+  const next = getSafeNextPath(nextParam);
+
+  // Build the most informative error: prefer error_code, then error, then description
+  const initialError =
+    errorCode ??
+    errorParam ??
+    (errorDescription ? `Google sign-in error: ${errorDescription}` : null);
+
+  const session = await auth.api
+    .getSession({ headers: await headers() })
+    .catch(() => null);
+
+  if (session?.user) {
+    redirect(next);
+  }
+
+  return (
+    <AuthShell
+      title="Welcome back"
+      subtitle="Log in to borrow books and share titles with your neighbourhood."
+    >
+      <SignInForm
+        next={next}
+        googleEnabled={isGoogleAuthEnabled}
+        initialError={initialError}
+      />
+    </AuthShell>
+  );
+}
