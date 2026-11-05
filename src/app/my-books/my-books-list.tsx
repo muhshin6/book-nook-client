@@ -31,6 +31,7 @@ import { authClient } from "@/lib/auth-client";
 import type { Book } from "@/types/book";
 import { EditBookDialog } from "./edit-book-dialog";
 import { getMyBooks, deleteBook } from "@/lib/api";
+import { getAvailableCopies, getTotalCopies } from "@/lib/books";
 
 export function MyBooksList() {
   const router = useRouter();
@@ -220,8 +221,8 @@ export function MyBooksList() {
         ) : (
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {books.map((book) => {
-              const copies = Math.max(0, book.copies ?? 0);
-              const totalCopies = Math.max(copies, book.totalCopies ?? copies);
+              const copies = getAvailableCopies(book);
+              const totalCopies = getTotalCopies(book);
 
               return (
                 <article

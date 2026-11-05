@@ -30,6 +30,7 @@ import { authClient } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 import type { Book } from "@/types/book";
 import { updateBook } from "@/lib/api";
+import { getAvailableCopies, getTotalCopies } from "@/lib/books";
 
 const CATEGORY_OPTIONS = [
   "Fiction",
@@ -62,7 +63,7 @@ export function EditBookDialog({
   const [category, setCategory] = React.useState(book.category || "Fiction");
   const [description, setDescription] = React.useState(book.description ?? "");
   const [totalCopies, setTotalCopies] = React.useState(
-    String(book.totalCopies ?? book.copies ?? 1)
+    String(getTotalCopies(book))
   );
   const [cover, setCover] = React.useState<File | null>(null);
   const [coverPreview, setCoverPreview] = React.useState<string | null>(null);
@@ -79,8 +80,8 @@ export function EditBookDialog({
     };
   }, []);
 
-  const currentCopies = book.copies ?? book.totalCopies ?? 0;
-  const currentTotal = book.totalCopies ?? currentCopies;
+  const currentCopies = getAvailableCopies(book);
+  const currentTotal = getTotalCopies(book);
   const borrowedOut = Math.max(0, currentTotal - currentCopies);
 
   const categories = React.useMemo(

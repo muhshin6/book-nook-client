@@ -7,6 +7,7 @@ import { notFound, redirect } from "next/navigation";
 import { BorrowButton } from "@/components/borrow-button";
 import { auth } from "@/lib/auth";
 import { getBookById } from "@/lib/api";
+import { getAvailableCopies, getTotalCopies } from "@/lib/books";
 import {
   ArrowLeft,
   Star,
@@ -61,8 +62,8 @@ export default async function BookDetailsPage({ params }: BookDetailsProps) {
 
   const ownerName = book.userName?.trim() || "A BookNook neighbour";
   const ownerInitial = ownerName.charAt(0).toUpperCase();
-  const copies = Math.max(0, book.copies ?? 1);
-  const totalCopies = Math.max(copies, book.totalCopies ?? copies);
+  const copies = getAvailableCopies(book);
+  const totalCopies = getTotalCopies(book);
   const isAvailable = copies > 0;
 
   return (

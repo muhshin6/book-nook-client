@@ -9,6 +9,7 @@ export interface Book {
   publishedYear?: number;
   status?: string;
   copies?: number;
+  availableCopies?: number;
   totalCopies?: number;
   userName?: string;
   userEmail?: string;
