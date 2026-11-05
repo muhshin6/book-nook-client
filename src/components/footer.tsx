@@ -2,6 +2,8 @@ import * as React from "react";
 import Link from "next/link";
 import { BookOpen, Heart } from "lucide-react";
 
+import { BOOK_CATEGORIES } from "@/lib/categories";
+
 export function Footer() {
   return (
     <footer className="bg-[#f2f6f2] dark:bg-[#070e0a] border-t border-zinc-200 dark:border-white/5 text-zinc-600 dark:text-zinc-400 text-sm transition-colors duration-200">
@@ -71,46 +73,16 @@ export function Footer() {
               Categories
             </h4>
             <ul className="space-y-2.5 text-sm">
-              <li>
-                <Link
-                  href="/books?category=Fiction"
-                  className="hover:text-[#22844c] dark:hover:text-[#94d5a5] transition-colors"
-                >
-                  Fiction
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/books?category=Science"
-                  className="hover:text-[#22844c] dark:hover:text-[#94d5a5] transition-colors"
-                >
-                  Science
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/books?category=History"
-                  className="hover:text-[#22844c] dark:hover:text-[#94d5a5] transition-colors"
-                >
-                  History
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/books?category=Kids"
-                  className="hover:text-[#22844c] dark:hover:text-[#94d5a5] transition-colors"
-                >
-                  Kids
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/books?category=Others"
-                  className="hover:text-[#22844c] dark:hover:text-[#94d5a5] transition-colors"
-                >
-                  Others
-                </Link>
-              </li>
+              {BOOK_CATEGORIES.map((category) => (
+                <li key={category}>
+                  <Link
+                    href={`/books?category=${encodeURIComponent(category)}`}
+                    className="hover:text-[#22844c] dark:hover:text-[#94d5a5] transition-colors"
+                  >
+                    {category}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
         </div>

@@ -31,19 +31,9 @@ import { cn } from "@/lib/utils";
 import type { Book } from "@/types/book";
 import { updateBook } from "@/lib/api";
 import { getAvailableCopies, getTotalCopies } from "@/lib/books";
+import { BOOK_CATEGORIES } from "@/lib/categories";
 
-const CATEGORY_OPTIONS = [
-  "Fiction",
-  "Sci-Fi",
-  "Fantasy",
-  "Classic",
-  "Mystery",
-  "Non-Fiction",
-  "Science",
-  "History",
-  "Kids",
-  "Others",
-];
+const CATEGORY_OPTIONS: readonly string[] = BOOK_CATEGORIES;
 
 interface EditBookDialogProps {
   book: Book;

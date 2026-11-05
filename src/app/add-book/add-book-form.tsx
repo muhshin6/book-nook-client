@@ -28,9 +28,10 @@ import { MAX_IMAGE_BYTES, uploadCover } from "@/lib/imgbb";
 import { cn } from "@/lib/utils";
 import { addBook } from "@/lib/api";
 import { authClient } from "@/lib/auth-client";
+import { BOOK_CATEGORIES, type BookCategory } from "@/lib/categories";
 
-const CATEGORIES = ["Fiction", "Science", "History", "Kids", "Others"] as const;
-type Category = (typeof CATEGORIES)[number];
+const CATEGORIES = BOOK_CATEGORIES;
+type Category = BookCategory;
 
 interface AddBookFormProps {
   user: {

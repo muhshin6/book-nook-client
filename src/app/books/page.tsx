@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { BookOpen, Search } from "lucide-react";
 import { getAllBooks } from "@/lib/api";
+import { CATEGORY_FILTERS } from "@/lib/categories";
 
 export const metadata: Metadata = {
   title: "All Books",
@@ -44,14 +45,7 @@ export default async function BooksPage({ searchParams }: BooksPageProps) {
       })
     : books;
 
-  const categories = [
-    "All",
-    "Fiction",
-    "Science",
-    "History",
-    "Kids",
-    "Others",
-  ];
+  const categories = CATEGORY_FILTERS;
 
   return (
     <div className="py-12 lg:py-16 transition-colors duration-200">
