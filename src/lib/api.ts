@@ -134,15 +134,29 @@ export async function borrowBook(
   );
 }
 
-export async function getBorrowStatus(_bookId: string): Promise<{
-  borrowed: boolean;
-}> {
-  void _bookId;
-  throw new ApiError(
-    "Borrow status endpoint not implemented on the backend.",
-    "NOT_IMPLEMENTED",
-    501,
+export async function getBorrowStatus(
+  bookId: string,
+  token?: string,
+): Promise<{ borrowed: boolean }> {
+  if (!token) {
+    throw new ApiError(
+      "Authentication required. Please sign in again.",
+      "UNAUTHORIZED",
+      401,
+    );
+  }
+
+  const borrows = await request<Borrow[]>(
+    "/borrows",
+    { method: "GET" },
+    token,
   );
+
+  return {
+    borrowed: borrows.some(
+      (borrow) => borrow.bookId === bookId && borrow.status === "borrowed",
+    ),
+  };
 }
 
 export async function returnBook(

@@ -45,17 +45,28 @@ export function BorrowButton({
 
     let isMounted = true;
 
-    getBorrowStatus(bookId)
-      .then(({ borrowed }) => {
+    const checkBorrowStatus = async () => {
+      try {
+        const { data, error } = await authClient.token();
+
+        if (error || !data?.token) {
+          if (isMounted) setBorrowState("available");
+          return;
+        }
+
+        const { borrowed } = await getBorrowStatus(bookId, data.token);
+
         if (isMounted) {
           setBorrowState(borrowed ? "borrowed" : "available");
         }
-      })
-      .catch(() => {
+      } catch {
         if (isMounted) {
           setBorrowState("available");
         }
-      });
+      }
+    };
+
+    void checkBorrowStatus();
 
     return () => {
       isMounted = false;
