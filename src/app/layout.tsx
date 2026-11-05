@@ -5,7 +5,6 @@ import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { Toaster } from "@/components/ui/toast";
 import { ThemeProvider } from "@/provider/theme-provider";
-import Script from "next/script";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,13 +22,31 @@ const lora = Lora({
   weight: ["400", "500", "600", "700"],
 });
 
+const siteDescription =
+  "Borrow physical books from neighbours, share titles from your own shelf, and keep stories circulating in your community.";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_BETTER_AUTH_URL ?? "http://localhost:3000",
+  ),
+  applicationName: "BookNook",
   title: {
     default: "BookNook",
     template: "BookNook | %s",
   },
-  description:
-    "Your personal book library.",
+  description: siteDescription,
+  openGraph: {
+    type: "website",
+    siteName: "BookNook",
+    title: "BookNook",
+    description: siteDescription,
+    url: "/",
+  },
+  twitter: {
+    card: "summary",
+    title: "BookNook",
+    description: siteDescription,
+  },
 };
 
 export default function RootLayout({
@@ -43,8 +60,6 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${lora.variable} dark h-full antialiased`}
       suppressHydrationWarning
     >
-      <head>
-      </head>
       <body className="min-h-full flex flex-col bg-[#fbfdfb] text-zinc-900 dark:bg-[#0a110e] dark:text-white transition-colors duration-200">
         <ThemeProvider>
           <Toaster>
