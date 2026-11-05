@@ -37,7 +37,7 @@ function formatDate(value?: string | null) {
 
 export function MyBorrowsTable() {
   const router = useRouter();
-  const { data: session } = authClient.useSession();
+  const { data: session, isPending } = authClient.useSession();
   const userEmail = session?.user?.email ?? "";
   const [borrows, setBorrows] = React.useState<Borrow[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
@@ -48,13 +48,7 @@ export function MyBorrowsTable() {
  React.useEffect(() => {
    let isMounted = true;
 
-   if (!userEmail) {
-     // Defer the state update to avoid synchronous cascading renders
-     queueMicrotask(() => {
-       if (isMounted) {
-         setIsLoading(false);
-       }
-     });
+   if (isPending || !userEmail) {
      return;
    }
 
@@ -91,7 +85,14 @@ export function MyBorrowsTable() {
    return () => {
      isMounted = false;
    };
- }, [reloadKey, userEmail, session?.session?.token]);
+ }, [reloadKey, userEmail, session?.session?.token, isPending]);
+
+  const activeError =
+    error ??
+    (!isPending && !userEmail
+      ? "Your session could not be loaded. Please sign in again."
+      : null);
+  const showLoading = isLoading || isPending;
 
   function handleRetry() {
     setError(null);
@@ -168,7 +169,7 @@ export function MyBorrowsTable() {
           </p>
         </div>
 
-        {isLoading ? (
+        {showLoading ? (
           <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm dark:border-white/5 dark:bg-[#0e1712]">
             <div className="space-y-4 p-6">
               {Array.from({ length: 3 }).map((_, index) => (
@@ -183,14 +184,14 @@ export function MyBorrowsTable() {
               ))}
             </div>
           </div>
-        ) : error ? (
+        ) : activeError ? (
           <div className="mx-auto max-w-lg rounded-2xl border border-zinc-200 bg-white p-10 text-center shadow-sm dark:border-white/5 dark:bg-[#0e1712]">
             <Library className="mx-auto mb-3 size-12 text-[#22844c] opacity-40 dark:text-[#94d5a5]" />
             <h2 className="font-serif text-lg font-semibold text-zinc-900 dark:text-white">
               Could not load your borrows
             </h2>
             <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-              {error}
+              {activeError}
             </p>
             <Button
               type="button"

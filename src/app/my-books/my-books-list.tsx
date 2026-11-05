@@ -35,7 +35,7 @@ import { getAvailableCopies, getTotalCopies } from "@/lib/books";
 
 export function MyBooksList() {
   const router = useRouter();
-  const { data: session } = authClient.useSession();
+  const { data: session, isPending } = authClient.useSession();
   const userEmail = session?.user?.email ?? "";
   const [books, setBooks] = React.useState<Book[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
@@ -48,12 +48,7 @@ export function MyBooksList() {
   React.useEffect(() => {
     let isMounted = true;
 
-    if (!userEmail) {
-      setTimeout(() => {
-        if (isMounted) {
-          setIsLoading(false);
-        }
-      }, 0);
+    if (isPending || !userEmail) {
       return;
     }
 
@@ -81,7 +76,14 @@ export function MyBooksList() {
     return () => {
       isMounted = false;
     };
-  }, [reloadKey, userEmail, session?.session?.token]);
+  }, [reloadKey, userEmail, session?.session?.token, isPending]);
+
+  const activeError =
+    error ??
+    (!isPending && !userEmail
+      ? "Your session could not be loaded. Please sign in again."
+      : null);
+  const showLoading = isLoading || isPending;
 
   function handleRetry() {
     setError(null);
@@ -166,7 +168,7 @@ export function MyBooksList() {
           </Link>
         </div>
 
-        {isLoading ? (
+        {showLoading ? (
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {Array.from({ length: 3 }).map((_, index) => (
               <div
@@ -183,14 +185,14 @@ export function MyBooksList() {
               </div>
             ))}
           </div>
-        ) : error ? (
+        ) : activeError ? (
           <div className="mx-auto max-w-lg rounded-2xl border border-zinc-200 bg-white p-10 text-center shadow-sm dark:border-white/5 dark:bg-[#0e1712]">
             <BookOpen className="mx-auto mb-3 size-12 text-[#22844c] opacity-40 dark:text-[#94d5a5]" />
             <h2 className="font-serif text-lg font-semibold text-zinc-900 dark:text-white">
               Could not load your books
             </h2>
             <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-              {error}
+              {activeError}
             </p>
             <Button
               type="button"
