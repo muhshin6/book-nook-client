@@ -22,20 +22,20 @@ Next.js 16 App Router + React 19 + TypeScript client. API server is the sibling 
 
 ## Verification baseline
 
-`npx tsc --noEmit` is clean. `npm run lint` reports errors/immutability warnings in `src/provider/theme-provider.tsx` plus unused-import warnings in `layout.tsx` and `profile/page.tsx`. These are pre-existing — do not attribute them to a new change.
+Both `npx tsc --noEmit` and `npm run lint` are clean. Keep them clean in new work.
 
 ## Architecture
 
 - App Router server components under `src/app/**/page.tsx`. `src/app/layout.tsx` owns fonts (Geist, Geist_Mono, Lora via `next/font`), `Navbar`, `Footer`, `ThemeProvider`, and the Base UI `Toaster`.
 - Next 16 route props are async: declare `params` / `searchParams` as `Promise<...>` and `await` them (see `src/app/books/page.tsx` and `src/app/books/[id]/page.tsx`).
-- Data access goes through `src/lib/api.ts`, which wraps `fetch` to `NEXT_PUBLIC_SERVER_BASE_URL`. `getAllBooks`, `getBookById`, and `getLatestBooks` work against the backend's `GET /api/books`. `borrowBook`, `getBorrowStatus`, `returnBook`, `getMyBooks`, `getMyBorrows`, `deleteBook`, and `updateBook` throw `ApiError` ("NOT_IMPLEMENTED") because the backend (`../book-nook-server/index.js`) only exposes `POST /api/books` and `GET /api/books` — those endpoints must be added to the server before borrow/return/my-books features work. `new-arrivals.tsx` hardcodes `http://localhost:5000/books/latest?limit=` (which the server doesn't implement); `add-book-form.tsx` POSTs to `${process.env.NEXT_PUBLIC_SERVER_BASE_URL}/api/books`.
+- Data access goes through `src/lib/api.ts`, which wraps `fetch` to `NEXT_PUBLIC_SERVER_BASE_URL`. Public reads use `GET /books`; protected calls send the BetterAuth JWT. `getBorrowStatus(bookId, token)` derives the current user's active borrow from `GET /borrows`.
 - Import alias `@/*` → `src/*` (tsconfig `paths`).
 - Tailwind v4 CSS-first: no `tailwind.config.*`. Tokens and the class-based dark variant live in `src/app/globals.css`. Dark is the default; theme persisted in localStorage key `booknook-theme` (`src/provider/theme-provider.tsx`).
 - Animations: `framer-motion` is installed. Use `<motion.div>` from `framer-motion` for entrance animations (see `src/components/new-arrivals.tsx` for staggered fade-up cards). `tw-animate-css` is also available for CSS animation utilities.
 - UI primitives in `src/components/ui/` are shadcn `base-nova` on `@base-ui/react`, not Radix. Prefer `npx shadcn@latest add <name>` or existing primitives. `components.json` aliases: components `@/components`, ui `@/components/ui`, lib `@/lib`, hooks `@/hooks`.
 - Class merging: `import { cn } from "@/lib/utils"` (re-exports the `cn` package). Not `clsx` + `tailwind-merge`.
 - Book shape in `src/types/book.ts`; ids are MongoDB `_id`, not `id`.
-- Category list is hard-coded in `src/app/books/page.tsx` (`All`, `Fiction`, `Science`, `History`, `Kids`, `Others`); `add-book-form.tsx` keeps a separate `CATEGORIES` without `All`.
+- Book categories live in `src/lib/categories.ts` (`BOOK_CATEGORIES`, `CATEGORY_FILTERS`). The filter pills, add/edit forms, and footer all derive from it; do not add per-file category lists.
 - Global toasts: `toast.add({ type, title, description })` from `@/components/ui/toast`; `Toaster` mounted in `layout.tsx`.
 
 ## API / data
@@ -53,8 +53,8 @@ Next.js 16 App Router + React 19 + TypeScript client. API server is the sibling 
 - JWT validation: `authenticateJWT` middleware verifies the `better-auth-session` cookie (or `Authorization: Bearer` header) using `jose.jwtVerify` with `BETTER_AUTH_SECRET`. Protected routes: `PATCH /books/:id`, `DELETE /books/:id`, `POST /borrows`, `GET /borrows`, `DELETE /borrows/:id`. Ownership enforced on book update/delete via `userEmail` match.
 - Client-side protected API calls send `Authorization: Bearer <token>` where `<token>` comes from `session.session.token` via `authClient.useSession()` (BetterAuth JWT plugin). All functions in `src/lib/api.ts` that call protected endpoints accept an optional `token` parameter: `borrowBook`, `returnBook`, `getMyBooks`, `getMyBorrows`, `deleteBook`, `updateBook`. Call sites pass `session.session?.token`.
 - `addBook` and public read endpoints (`GET /books`, `GET /books/:id`, `GET /books?...`) do not require auth.
-- `src/lib/api.ts` implements `getAllBooks`, `getBookById`, `getLatestBooks`, `getMyBooks(userEmail)`, `updateBook(bookId, data)`, `deleteBook(bookId)`, `borrowBook(bookId, userEmail, userName?)`, `returnBook(borrowId)`, and `getMyBorrows(userEmail)` against the backend. `getBorrowStatus` still throws `ApiError` ("NOT_IMPLEMENTED").
-- `new-arrivals.tsx` calls `getLatestBooks(12)` via `src/lib/api.ts` (`GET /books?sort=createdAt:desc&limit=12`); it no longer hardcodes `http://localhost:5000`. Backend must be running for live data; pages show fallback UI when offline.
+- `src/lib/api.ts` implements `getAllBooks`, `getBookById`, `getLatestBooks`, `getMyBooks(userEmail)`, `updateBook(bookId, data)`, `deleteBook(bookId)`, `borrowBook(bookId, userEmail, userName?)`, `returnBook(borrowId)`, `getMyBorrows(userEmail)`, and `getBorrowStatus(bookId, token)` against the backend.
+- `new-arrivals.tsx` calls `getLatestBooks(10)` via `src/lib/api.ts` (`GET /books?sort=createdAt:desc&limit=10`); it never hardcodes the API URL. Backend must be running for live data; the section shows an empty state when offline or empty.
 - `/add-book` uploads covers to ImgBB via `NEXT_PUBLIC_IMGBB_API_KEY`; submission fails with a toast if the key is missing. `POST /books` persists `userName`, `userEmail`, and `createdAt`.
 - To run the backend: `npm run dev` in `../book-nook-server`; needs `MONGODB_URI` in its `.env` and seeds sample books on connect.
 - `.env` is committed and pre-populated (auth secrets, Google keys, ImgBB key, base URLs). Do not add new secret values to it.
@@ -65,7 +65,7 @@ Next.js 16 App Router + React 19 + TypeScript client. API server is the sibling 
 - Required server env: `MONGODB_URI`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL` (default `http://localhost:3000`). Client env: `NEXT_PUBLIC_SERVER_BASE_URL`, `NEXT_PUBLIC_IMGBB_API_KEY`, `NEXT_PUBLIC_BETTER_AUTH_URL` (default `http://localhost:3000`).
 - Google only when both `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` are set; callback `http://localhost:3000/api/auth/callback/google`.
 - Plugins: `jwt()`, then `nextCookies()` last. `autoSignIn: false` for email/password. Sign-up hook rejects passwords missing an uppercase letter, lowercase letter, or 6 chars; rules mirrored in `src/lib/password.ts` (`PASSWORD_RULES`, `validatePassword`).
-- Sessions: client `authClient.useSession()` (Navbar, Borrow button); server `auth.api.getSession({ headers: await headers() })` (`/add-book`, `/login`, `/register`). Pages that read sessions are `force-dynamic`.
+- Sessions: client `authClient.useSession()` (Navbar, Borrow button); server `auth.api.getSession({ headers: await headers() })` (`/add-book`, `/sign-in`, `/sign-up`). Pages that read sessions are `force-dynamic`.
 - `src/proxy.ts` defines a `proxy` handler redirecting unauthenticated requests on `/add-book`, `/add-book/:path*`, `/books/:id`, `/my-books*`, `/my-borrows*`, but it is NOT wired as Next.js middleware (no `middleware.ts`, nothing imports it). Protection is enforced server-side in pages instead. Do not treat `proxy.ts` as active middleware.
 - Post-login redirects via `getSafeNextPath()` / `buildLoginPath()` from `src/lib/redirect.ts`; never pass a raw `next` query value to `redirect()`/`router.push()`.
 - `/login` and `/register` are server pages with client forms (`login-form.tsx`, `register-form.tsx`). `/forgot-password`/`/reset-password` use BetterAuth's reset flow; with no email provider, the reset URL is printed to the server console.

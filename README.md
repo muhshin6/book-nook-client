@@ -10,7 +10,8 @@ BookNook is a Next.js 16 + React 19 + TypeScript client for the BookNook book-sh
 ## Features
 
 - **Browse books** — Explore the community book collection with category filtering (Fiction, Science, History, Kids, Others).
-- **New Arrivals carousel** — See the latest 12 books added, sorted newest first, with animated cards and a "See All Books" link.
+- **Search** — Find a title by book name, author, category, or description, and keep the active category filter while searching.
+- **New Arrivals carousel** — See the latest 10 books added, sorted newest first, with animated cards and a "See All Books" link.
 - **Add a book** — Contribute a book to the community shelf with cover image upload (ImgBB), title, author, category, description, and total copies.
 - **My Books** — View books you've added, edit details, or delete them (owner-only, JWT-protected).
 - **Borrow & Return** — Borrow available books (decrements copies via `$inc`), track active borrows, and return books when finished (increments copies). Double-borrow protection prevents borrowing the same book twice.
@@ -101,5 +102,5 @@ Run `npm run dev` in `../book-nook-server` to start it.
 
 ## Notes
 
-- This repo has 2 commits in its history (initial scaffold + frontend setup). No commit fabrication was performed.
+- Development is split into small, reviewable commits (features, fixes, refactors, and docs) rather than one bulk commit.
 - Build artifacts (`.next/`, `tsconfig.tsbuildinfo`) are not committed.
