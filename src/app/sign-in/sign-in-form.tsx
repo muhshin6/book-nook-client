@@ -42,6 +42,9 @@ export function SignInForm({
   );
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
+  const signUpHref =
+    next === "/" ? "/sign-up" : `/sign-up?next=${encodeURIComponent(next)}`;
+
   const googleErrorHref =
     next === "/"
       ? "/sign-in?error=google"
@@ -216,7 +219,7 @@ export function SignInForm({
       <p className="text-center text-sm text-zinc-600 dark:text-zinc-400">
         New to BookNook?{" "}
         <Link
-          href={"/sign-up"}
+          href={signUpHref}
           className="font-semibold text-[#22844c] hover:underline dark:text-[#94d5a5]"
         >
           Create an account

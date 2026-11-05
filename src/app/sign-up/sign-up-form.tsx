@@ -358,7 +358,7 @@ export function SignUpForm({
       <p className="text-center text-sm text-zinc-600 dark:text-zinc-400">
         Already have an account?{" "}
         <Link
-          href={"/sign-in"}
+          href={signInHref}
           className="font-semibold text-[#22844c] hover:underline dark:text-[#94d5a5]"
         >
           Log in

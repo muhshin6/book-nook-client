@@ -42,7 +42,15 @@ export function Navbar({ activeTab }: NavbarProps) {
   const { data: session, isPending } = authClient.useSession();
 
   const user = session?.user;
-  const isAuthPage = pathname === "/login" || pathname === "/sign-up";
+  const isAuthPage = Boolean(
+    pathname &&
+      [
+        "/sign-in",
+        "/sign-up",
+        "/forgot-password",
+        "/reset-password",
+      ].includes(pathname),
+  );
   const nextTarget = isAuthPage ? "/" : pathname || "/";
   const signInHref =
     nextTarget === "/"
@@ -249,7 +257,7 @@ export function Navbar({ activeTab }: NavbarProps) {
             <>
               {/* Login Button */}
               <Link
-                href={`/sign-in`}
+                href={signInHref}
                 className="px-4 py-1.5 rounded-md text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-200 dark:hover:text-white bg-zinc-100 hover:bg-zinc-200 dark:bg-[#16221b] border border-zinc-200 dark:border-zinc-700/60 transition-all"
               >
                 Login
@@ -257,7 +265,7 @@ export function Navbar({ activeTab }: NavbarProps) {
 
               {/* Register Button */}
               <Link
-                href={`/sign-up`}
+                href={signUpHref}
                 className="px-4 py-1.5 rounded-md text-sm font-semibold text-white dark:text-[#0a1910] bg-[#22844c] hover:bg-[#1a6e3e] dark:bg-[#94d5a5] dark:hover:bg-[#a6e2b5] transition-all shadow-sm"
               >
                 Register
