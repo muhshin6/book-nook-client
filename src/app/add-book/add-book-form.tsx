@@ -150,7 +150,6 @@ export function AddBookForm({ user }: AddBookFormProps) {
       }
 
       // 2. Create book object
-      // 2. Create book object
       const book = {
         title,
         author,
@@ -162,10 +161,8 @@ export function AddBookForm({ user }: AddBookFormProps) {
         userEmail: user.email,
       };
 
-      console.log("Book Data:", book);
-
       // 3. Send data to backend
-      const {data, error} = await authClient.token();
+      const { data, error } = await authClient.token();
       if (error || !data?.token) {
         throw new Error("Could not get authentication token.");
       }

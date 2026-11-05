@@ -60,12 +60,12 @@ export function GoogleAuthButton({
     setIsPending(true);
 
     try {
-      const { data, error } = await authClient.signIn.social({
+      const { error } = await authClient.signIn.social({
         provider: "google",
         callbackURL,
         errorCallbackURL,
       });
-      console.log("Google OAuth response:", { data, error });
+
       if (error) {
         toast.add({
           type: "error",
