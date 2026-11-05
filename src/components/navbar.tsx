@@ -41,6 +41,20 @@ export function Navbar({ activeTab }: NavbarProps) {
   const { theme, toggleTheme } = useTheme();
   const { data: session, isPending } = authClient.useSession();
 
+  React.useEffect(() => {
+    if (!mobileMenuOpen) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setMobileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [mobileMenuOpen]);
+
   const user = session?.user;
   const isAuthPage = Boolean(
     pathname &&
@@ -105,7 +119,11 @@ export function Navbar({ activeTab }: NavbarProps) {
         {/* Left Side: Brand & Main Navigation */}
         <div className="flex items-center gap-8 lg:gap-12">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2.5 group">
+          <Link
+            href="/"
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center gap-2.5 group"
+          >
             <div className="w-8 h-8 rounded-lg bg-[#22844c] dark:bg-[#94d5a5] flex items-center justify-center text-white dark:text-[#0a1910] shadow-sm transition-transform duration-200 group-hover:scale-105">
               <BookOpen className="w-4 h-4 stroke-[2.2]" />
             </div>
@@ -115,7 +133,7 @@ export function Navbar({ activeTab }: NavbarProps) {
           </Link>
 
           {/* Nav Links */}
-          <nav className="hidden md:flex items-center gap-6">
+          <nav aria-label="Primary" className="hidden md:flex items-center gap-6">
             <Link
               href="/"
               className={`text-sm font-medium transition-colors ${
@@ -290,14 +308,16 @@ export function Navbar({ activeTab }: NavbarProps) {
           </button>
           <button
             type="button"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            onClick={() => setMobileMenuOpen((open) => !open)}
             className="p-1.5 text-zinc-600 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white rounded-md hover:bg-zinc-100 dark:hover:bg-white/5 transition-colors"
-            aria-label="Toggle menu"
+            aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={mobileMenuOpen}
+            aria-controls="mobile-navigation"
           >
             {mobileMenuOpen ? (
-              <X className="w-5 h-5" />
+              <X className="w-5 h-5" aria-hidden="true" />
             ) : (
-              <Menu className="w-5 h-5" />
+              <Menu className="w-5 h-5" aria-hidden="true" />
             )}
           </button>
         </div>
@@ -305,8 +325,11 @@ export function Navbar({ activeTab }: NavbarProps) {
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-zinc-200 dark:border-white/5 bg-white dark:bg-[#0d1410] px-6 py-4 space-y-4 animate-in fade-in slide-in-from-top-2 duration-200">
-          <nav className="flex flex-col space-y-3">
+        <div
+          id="mobile-navigation"
+          className="md:hidden border-t border-zinc-200 dark:border-white/5 bg-white dark:bg-[#0d1410] px-6 py-4 space-y-4 animate-in fade-in slide-in-from-top-2 duration-200"
+        >
+          <nav aria-label="Mobile" className="flex flex-col space-y-3">
             <Link
               href="/"
               onClick={() => setMobileMenuOpen(false)}
