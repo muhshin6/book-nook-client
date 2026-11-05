@@ -63,31 +63,34 @@ export function SignUpForm({
   const [image, setImage] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [showPassword, setShowPassword] = React.useState(false);
-  const [formError, setFormError] = React.useState<string | null>(
-    initialError ?? null
-  );
+  // Resolve the OAuth error code to a human message once, so the alert box
+  // never renders a raw code from the query string.
+  const initialMessage = initialError
+    ? getAuthErrorMessage(
+        initialError,
+        "Google sign-in could not be completed. Please try again."
+      )
+    : null;
+  const [formError, setFormError] = React.useState<string | null>(initialMessage);
   const [fieldErrors, setFieldErrors] = React.useState<FieldErrors>({});
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const signInHref =
     next === "/" ? "/sign-in" : `/sign-in?next=${encodeURIComponent(next)}`;
 
+  // No `error` param here: BetterAuth appends the real error code to this URL,
+  // so a placeholder would collide with it and hide the actual cause.
   const googleErrorHref =
-    next === "/"
-      ? "/sign-up?error=google"
-      : `/sign-up?error=google&next=${encodeURIComponent(next)}`;
+    next === "/" ? "/sign-up" : `/sign-up?next=${encodeURIComponent(next)}`;
 
   React.useEffect(() => {
-    if (!initialError) return;
+    if (!initialMessage) return;
     toast.add({
       type: "error",
       title: "Google sign-in failed",
-      description: getAuthErrorMessage(
-        initialError,
-        "Google sign-in could not be completed. Please try again."
-      ),
+      description: initialMessage,
     });
-  }, [initialError]);
+  }, [initialMessage]);
 
   const passwordChecks = getPasswordChecks(password);
 

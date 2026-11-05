@@ -26,12 +26,17 @@ interface SignInPageProps {
 export default async function SignInPage({ searchParams }: SignInPageProps) {
   const params = await searchParams;
   const nextParam = Array.isArray(params.next) ? params.next[0] : params.next;
-  const errorParam = Array.isArray(params.error) ? params.error[0] : params.error;
+  // BetterAuth appends `error=<code>` to the callback URL, so an older link
+  // that already had a placeholder can arrive as an array — the real code is
+  // the last entry.
+  const errorParam = Array.isArray(params.error)
+    ? params.error[params.error.length - 1]
+    : params.error;
   const errorDescription = Array.isArray(params.error_description)
-    ? params.error_description[0]
+    ? params.error_description[params.error_description.length - 1]
     : params.error_description;
   const errorCode = Array.isArray(params.error_code)
-    ? params.error_code[0]
+    ? params.error_code[params.error_code.length - 1]
     : params.error_code;
   const next = getSafeNextPath(nextParam);
 

@@ -18,19 +18,32 @@ interface SignUpPageProps {
   searchParams: Promise<{
     next?: string | string[];
     error?: string | string[];
+    error_description?: string | string[];
+    error_code?: string | string[];
   }>;
 }
 
 export default async function SignUpPage({ searchParams }: SignUpPageProps) {
   const params = await searchParams;
   const nextParam = Array.isArray(params.next) ? params.next[0] : params.next;
+  // BetterAuth appends `error=<code>` to the callback URL, so an older link
+  // that already had a placeholder can arrive as an array — the real code is
+  // the last entry.
   const errorParam = Array.isArray(params.error)
-    ? params.error[0]
+    ? params.error[params.error.length - 1]
     : params.error;
+  const errorDescription = Array.isArray(params.error_description)
+    ? params.error_description[params.error_description.length - 1]
+    : params.error_description;
+  const errorCode = Array.isArray(params.error_code)
+    ? params.error_code[params.error_code.length - 1]
+    : params.error_code;
   const next = getSafeNextPath(nextParam);
-  const initialError = errorParam
-    ? "Google sign-in could not be completed. Please try again."
-    : null;
+  // Pass the real code through so getAuthErrorMessage can map it to a message.
+  const initialError =
+    errorCode ??
+    errorParam ??
+    (errorDescription ? `Google sign-in error: ${errorDescription}` : null);
 
   const session = await auth.api
     .getSession({ headers: await headers() })

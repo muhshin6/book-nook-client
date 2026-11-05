@@ -41,6 +41,27 @@ export function getAuthErrorMessage(
     case "server_error":
     case "temporarily_unavailable":
       return "Google sign-in is temporarily unavailable. Please try again later.";
+    case "unable_to_link_account":
+    case "account_not_linked":
+      return "Your Google account could not be linked to an existing BookNook account. Try signing in with your email and password instead.";
+    case "account_already_linked_to_different_user":
+      return "This Google account is already linked to a different BookNook account.";
+    case "email_does_not_match":
+      return "The email from Google does not match this account.";
+    case "email_not_found":
+      return "Google did not share an email address. Grant access to your email and try again.";
+    case "email_not_verified":
+      return "Please verify your email address before logging in.";
+    case "unable_to_get_user_info":
+    case "invalid_code":
+    case "no_code":
+    case "nonce_binding_missing":
+    case "no_callback_url":
+      return "Google sign-in could not be completed. Please try again.";
+    case "oauth_provider_not_found":
+    case "issuer_missing":
+    case "issuer_mismatch":
+      return "Google sign-in is not configured correctly. Please try again later.";
     default:
       return (
         candidate.message ||
