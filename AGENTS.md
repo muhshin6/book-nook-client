@@ -55,14 +55,14 @@ Both `npx tsc --noEmit` and `npm run lint` are clean. Keep them clean in new wor
 - `addBook` and public read endpoints (`GET /books`, `GET /books/:id`, `GET /books?...`) do not require auth.
 - `src/lib/api.ts` implements `getAllBooks`, `getBookById`, `getLatestBooks`, `getMyBooks(userEmail)`, `updateBook(bookId, data)`, `deleteBook(bookId)`, `borrowBook(bookId, userEmail, userName?)`, `returnBook(borrowId)`, `getMyBorrows(userEmail)`, and `getBorrowStatus(bookId, token)` against the backend.
 - `new-arrivals.tsx` calls `getLatestBooks(10)` via `src/lib/api.ts` (`GET /books?sort=createdAt:desc&limit=10`); it never hardcodes the API URL. Backend must be running for live data; the section shows an empty state when offline or empty.
-- `/add-book` uploads covers to ImgBB via `NEXT_PUBLIC_IMGBB_API_KEY`; submission fails with a toast if the key is missing. `POST /books` persists `userName`, `userEmail`, and `createdAt`.
+- `/add-book` uploads covers to ImgBB via `IMGBB_API_KEY`; submission fails with a toast if the key is missing. `POST /books` persists `userName`, `userEmail`, and `createdAt`.
 - To run the backend: `npm run dev` in `../book-nook-server`; needs `MONGODB_URI` in its `.env` and seeds sample books on connect.
 - `.env` is committed and pre-populated (auth secrets, Google keys, ImgBB key, base URLs). Do not add new secret values to it.
 
 ## Authentication
 
 - BetterAuth (MongoDB adapter): `src/lib/auth.ts`; browser client `src/lib/auth-client.ts`; handler `src/app/api/auth/[...all]/route.ts`. Auth shares the `book-nook` database with books.
-- Required server env: `MONGODB_URI`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL` (default `http://localhost:3000`). Client env: `NEXT_PUBLIC_SERVER_BASE_URL`, `NEXT_PUBLIC_IMGBB_API_KEY`, `NEXT_PUBLIC_BETTER_AUTH_URL` (default `http://localhost:3000`).
+- Required server env: `MONGODB_URI`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL` (default `http://localhost:3000`). Client env: `NEXT_PUBLIC_SERVER_BASE_URL`, `IMGBB_API_KEY`, `NEXT_PUBLIC_BETTER_AUTH_URL` (default `http://localhost:3000`).
 - Google only when both `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` are set; callback `http://localhost:3000/api/auth/callback/google`.
 - Plugins: `jwt()`, then `nextCookies()` last. `autoSignIn: false` for email/password. Sign-up hook rejects passwords missing an uppercase letter, lowercase letter, or 6 chars; rules mirrored in `src/lib/password.ts` (`PASSWORD_RULES`, `validatePassword`).
 - Sessions: client `authClient.useSession()` (Navbar, Borrow button); server `auth.api.getSession({ headers: await headers() })` (`/add-book`, `/sign-in`, `/sign-up`). Pages that read sessions are `force-dynamic`.

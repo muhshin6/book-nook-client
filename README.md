@@ -51,7 +51,7 @@ Create a `.env` (already committed and pre-populated):
 
 ```
 NEXT_PUBLIC_SERVER_BASE_URL=http://localhost:5000
-NEXT_PUBLIC_IMGBB_API_KEY=your_imgbb_key
+IMGBB_API_KEY=your_imgbb_key
 NEXT_PUBLIC_BETTER_AUTH_URL=http://localhost:3000
 ```
 

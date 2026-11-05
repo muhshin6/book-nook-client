@@ -146,11 +146,7 @@ export async function getBorrowStatus(
     );
   }
 
-  const borrows = await request<Borrow[]>(
-    "/borrows",
-    { method: "GET" },
-    token,
-  );
+  const borrows = await request<Borrow[]>("/borrows", { method: "GET" }, token);
 
   return {
     borrowed: borrows.some(
