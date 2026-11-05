@@ -1,36 +1,105 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# BookNook
+
+BookNook is a Next.js 16 + React 19 + TypeScript client for the BookNook book-sharing platform. Browse books, add titles to the community shelf, borrow books from neighbors, and manage your personal library — all in one place.
+
+## Live Site
+
+- **Development:** http://localhost:3000
+- **Backend API:** http://localhost:5000 (sibling repo `../book-nook-server`)
+
+## Features
+
+- **Browse books** — Explore the community book collection with category filtering (Fiction, Science, History, Kids, Others).
+- **New Arrivals carousel** — See the latest 12 books added, sorted newest first, with animated cards and a "See All Books" link.
+- **Add a book** — Contribute a book to the community shelf with cover image upload (ImgBB), title, author, category, description, and total copies.
+- **My Books** — View books you've added, edit details, or delete them (owner-only, JWT-protected).
+- **Borrow & Return** — Borrow available books (decrements copies via `$inc`), track active borrows, and return books when finished (increments copies). Double-borrow protection prevents borrowing the same book twice.
+- **Google Sign-In** — Authenticate with Google OAuth via BetterAuth, plus email/password sign-up and sign-in.
+- **Responsive design** — Mobile-first grid layouts (1–5 columns) that adapt to phones, tablets, and desktops.
+- **Dark mode** — Theme persisted in localStorage, with a toggle in the Navbar.
+- **Framer Motion animations** — Staggered fade-in effects on New Arrivals cards and section headers.
+- **Global toasts** — Success and error notifications via the Base UI Toaster mounted in `layout.tsx`.
+
+## Tech Stack
+
+- Next.js 16 (App Router, Turbopack)
+- React 19
+- TypeScript
+- Tailwind CSS v4 (CSS-first)
+- shadcn/ui (base-nova on `@base-ui/react`)
+- Framer Motion
+- BetterAuth (MongoDB adapter, JWT plugin)
+- ImgBB (cover image uploads)
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18+
+- The backend server running (`../book-nook-server` on port 5000) with `MONGODB_URI` configured
+
+### Install
+
+```bash
+npm install
+```
+
+### Environment
+
+Create a `.env` (already committed and pre-populated):
+
+```
+NEXT_PUBLIC_SERVER_BASE_URL=http://localhost:5000
+NEXT_PUBLIC_IMGBB_API_KEY=your_imgbb_key
+NEXT_PUBLIC_BETTER_AUTH_URL=http://localhost:3000
+```
+
+### Run
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Available Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Script | Description |
+|--------|-------------|
+| `npm run dev` | Start dev server on :3000 (Turbopack) |
+| `npm run build` | Production build (`next build --webpack`) |
+| `npm start` | Serve the production build |
+| `npm run lint` | Run ESLint flat config |
+| `npx tsc --noEmit` | TypeScript typecheck |
 
-## Learn More
+## Project Structure
 
-To learn more about Next.js, take a look at the following resources:
+```
+src/
+  app/              # App Router pages (server components)
+  components/       # Reusable UI components
+  components/ui/    # shadcn base-nova primitives (@base-ui/react)
+  lib/              # API client, auth, auth-client, password utils, redirects
+  provider/         # ThemeProvider
+  types/            # Book, Borrow TypeScript types
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Backend
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+The API server is the sibling repo `../book-nook-server` (Express 5 + MongoDB, port 5000). It exposes 8 routes:
 
-## Deploy on Vercel
+- `GET /books` — list all books (supports `sort`, `limit`, `userEmail`)
+- `GET /books/:id` — get one book
+- `POST /books` — add a book
+- `PATCH /books/:id` — update a book (protected, owner only)
+- `DELETE /books/:id` — delete a book (protected, owner only)
+- `POST /borrows` — borrow a book (protected)
+- `GET /borrows` — get user's borrows (protected)
+- `DELETE /borrows/:id` — return a book (protected)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Run `npm run dev` in `../book-nook-server` to start it.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Notes
+
+- This repo has 2 commits in its history (initial scaffold + frontend setup). No commit fabrication was performed.
+- Build artifacts (`.next/`, `tsconfig.tsbuildinfo`) are not committed.
