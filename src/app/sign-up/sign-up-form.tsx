@@ -67,8 +67,6 @@ export function SignUpForm({
 
   const signInHref =
     next === "/" ? "/sign-in" : `/sign-in?next=${encodeURIComponent(next)}`;
-  const signUpHref =
-    next === "/" ? "/sign-up" : `/sign-up?next=${encodeURIComponent(next)}`;
 
   const googleErrorHref =
     next === "/"
@@ -170,7 +168,7 @@ export function SignUpForm({
         description: "Log in with your new email and password.",
       });
 
-      router.push(signUpHref);
+      router.push(signInHref);
       router.refresh();
     } catch (error) {
       showError(getAuthErrorMessage(error, "Could not create your account."));
