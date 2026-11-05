@@ -21,7 +21,7 @@ export function NewArrivals({ initialBooks = [] }: NewArrivalsProps) {
     let isMounted = true;
     const fetchLatest = async () => {
       try {
-        const data = await getLatestBooks(12);
+        const data = await getLatestBooks(10);
         if (isMounted && Array.isArray(data) && data.length > 0) {
           setBooks(data);
         }
@@ -81,12 +81,28 @@ export function NewArrivals({ initialBooks = [] }: NewArrivalsProps) {
                 </div>
               ))}
             </motion.div>
+          ) : books.length === 0 ? (
+            <div className="mx-auto max-w-lg rounded-2xl border border-zinc-200 bg-white p-10 text-center shadow-sm dark:border-white/5 dark:bg-[#0e1712]">
+              <BookOpen className="mx-auto mb-3 size-12 text-[#22844c] opacity-40 dark:text-[#94d5a5]" />
+              <h3 className="font-serif text-lg font-semibold text-zinc-900 dark:text-white">
+                No new arrivals yet
+              </h3>
+              <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+                Be the first to share a book with your neighbourhood.
+              </p>
+              <Link
+                href="/add-book"
+                className="mt-5 inline-flex items-center gap-2 rounded-lg bg-[#22844c] px-4 py-2 text-sm font-semibold text-white dark:bg-[#94d5a5] dark:text-[#0a1910]"
+              >
+                Add a Book
+              </Link>
+            </div>
           ) : (
             <motion.div
               layout
               className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-5"
             >
-              {books.slice(0, 10).map((book, idx) => {
+              {books.map((book, idx) => {
                 const hasImageError = imgErrors[book._id];
                 return (
                   <motion.div
