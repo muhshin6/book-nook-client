@@ -1,11 +1,12 @@
 export const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
 
 export async function uploadCover(file: File): Promise<string> {
-  const apiKey = process.env.IMGBB_API_KEY;
+  const apiKey =
+    process.env.NEXT_PUBLIC_IMGBB_API_KEY || process.env.IMGBB_API_KEY;
 
   if (!apiKey) {
     throw new Error(
-      "Image upload is not configured. Add IMGBB_API_KEY to your environment."
+      "Image upload is not configured. Add NEXT_PUBLIC_IMGBB_API_KEY or IMGBB_API_KEY to your environment."
     );
   }
 

@@ -1,10 +1,17 @@
 import type { Book } from "@/types/book";
 import type { Borrow } from "@/types/borrow";
 
-const BASE_URL = process.env.NEXT_PUBLIC_SERVER_BASE_URL;
+const DEFAULT_SERVER_URL = "https://book-nook-backend-theta.vercel.app";
 
-if (!BASE_URL) {
-  throw new Error("NEXT_PUBLIC_SERVER_BASE_URL is not set.");
+export function getBaseUrl(): string {
+  const url = process.env.NEXT_PUBLIC_SERVER_BASE_URL;
+  if (url && url.trim().length > 0) {
+    if (url.includes("localhost") && process.env.NODE_ENV === "production") {
+      return DEFAULT_SERVER_URL;
+    }
+    return url.replace(/\/$/, "");
+  }
+  return DEFAULT_SERVER_URL;
 }
 
 export class ApiError extends Error {
@@ -31,7 +38,8 @@ async function request<T>(
     headers.set("Authorization", `Bearer ${token}`);
   }
 
-  const res = await fetch(`${BASE_URL}${path}`, {
+  const baseUrl = getBaseUrl();
+  const res = await fetch(`${baseUrl}${path}`, {
     ...init,
     headers,
     credentials: "include",
@@ -59,11 +67,16 @@ async function request<T>(
 }
 
 export async function getAllBooks(category?: string): Promise<Book[]> {
-  const books = await request<Book[]>("/books");
-  if (!category || category === "All") return books;
-  return books.filter(
-    (b) => b.category?.toLowerCase() === category.toLowerCase(),
-  );
+  try {
+    const books = await request<Book[]>("/books");
+    if (!category || category === "All") return books;
+    return books.filter(
+      (b) => b.category?.toLowerCase() === category.toLowerCase(),
+    );
+  } catch (error) {
+    console.error("Failed to fetch books:", error);
+    return [];
+  }
 }
 
 export async function getBookById(id: string): Promise<Book | null> {
