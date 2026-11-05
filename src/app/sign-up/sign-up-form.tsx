@@ -22,7 +22,11 @@ import { Label } from "@/components/ui/label";
 import { toast } from "@/components/ui/toast";
 import { authClient } from "@/lib/auth-client";
 import { getAuthErrorMessage } from "@/lib/auth-errors";
-import { validatePassword } from "@/lib/password";
+import {
+  PASSWORD_RULES,
+  getPasswordChecks,
+  validatePassword,
+} from "@/lib/password";
 import { cn } from "@/lib/utils";
 
 interface SignUpFormProps {
@@ -85,11 +89,7 @@ export function SignUpForm({
     });
   }, [initialError]);
 
-  const passwordChecks = {
-    length: password.length >= 6,
-    uppercase: /[A-Z]/.test(password),
-    lowercase: /[a-z]/.test(password),
-  };
+  const passwordChecks = getPasswordChecks(password);
 
   function showError(message: string) {
     setFormError(message);
@@ -285,34 +285,28 @@ export function SignUpForm({
         </div>
 
         <ul className="space-y-1 pt-1" aria-label="Password requirements">
-          {[
-            { ok: passwordChecks.length, label: "At least 6 characters" },
-            {
-              ok: passwordChecks.uppercase,
-              label: "At least one uppercase letter",
-            },
-            {
-              ok: passwordChecks.lowercase,
-              label: "At least one lowercase letter",
-            },
-          ].map((rule) => (
-            <li
-              key={rule.label}
-              className={cn(
-                "flex items-center gap-1.5 text-xs",
-                rule.ok
-                  ? "text-[#22844c] dark:text-[#94d5a5]"
-                  : "text-zinc-500 dark:text-zinc-400"
-              )}
-            >
-              {rule.ok ? (
-                <Check className="size-3.5" />
-              ) : (
-                <X className="size-3.5" />
-              )}
-              {rule.label}
-            </li>
-          ))}
+          {PASSWORD_RULES.map((rule) => {
+            const ok = passwordChecks[rule.key];
+
+            return (
+              <li
+                key={rule.key}
+                className={cn(
+                  "flex items-center gap-1.5 text-xs",
+                  ok
+                    ? "text-[#22844c] dark:text-[#94d5a5]"
+                    : "text-zinc-500 dark:text-zinc-400"
+                )}
+              >
+                {ok ? (
+                  <Check className="size-3.5" />
+                ) : (
+                  <X className="size-3.5" />
+                )}
+                {rule.label}
+              </li>
+            );
+          })}
         </ul>
 
         {fieldErrors.password ? (

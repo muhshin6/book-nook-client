@@ -11,7 +11,11 @@ import { Label } from "@/components/ui/label";
 import { toast } from "@/components/ui/toast";
 import { authClient } from "@/lib/auth-client";
 import { getAuthErrorMessage } from "@/lib/auth-errors";
-import { validatePassword } from "@/lib/password";
+import {
+  PASSWORD_RULES,
+  getPasswordChecks,
+  validatePassword,
+} from "@/lib/password";
 import { cn } from "@/lib/utils";
 
 export function ResetPasswordForm({ token }: { token: string }) {
@@ -23,11 +27,7 @@ export function ResetPasswordForm({ token }: { token: string }) {
   const [error, setError] = React.useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
-  const passwordChecks = {
-    length: password.length >= 6,
-    uppercase: /[A-Z]/.test(password),
-    lowercase: /[a-z]/.test(password),
-  };
+  const passwordChecks = getPasswordChecks(password);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -116,29 +116,23 @@ export function ResetPasswordForm({ token }: { token: string }) {
         </div>
 
         <ul className="space-y-1 pt-1" aria-label="Password requirements">
-          {[
-            { ok: passwordChecks.length, label: "At least 6 characters" },
-            {
-              ok: passwordChecks.uppercase,
-              label: "At least one uppercase letter",
-            },
-            {
-              ok: passwordChecks.lowercase,
-              label: "At least one lowercase letter",
-            },
-          ].map((rule) => (
-            <li
-              key={rule.label}
-              className={cn(
-                "text-xs",
-                rule.ok
-                  ? "text-[#22844c] dark:text-[#94d5a5]"
-                  : "text-zinc-500 dark:text-zinc-400"
-              )}
-            >
-              {rule.ok ? "✓" : "•"} {rule.label}
-            </li>
-          ))}
+          {PASSWORD_RULES.map((rule) => {
+            const ok = passwordChecks[rule.key];
+
+            return (
+              <li
+                key={rule.key}
+                className={cn(
+                  "text-xs",
+                  ok
+                    ? "text-[#22844c] dark:text-[#94d5a5]"
+                    : "text-zinc-500 dark:text-zinc-400"
+                )}
+              >
+                {ok ? "✓" : "•"} {rule.label}
+              </li>
+            );
+          })}
         </ul>
       </div>
 
