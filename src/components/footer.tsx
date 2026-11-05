@@ -20,7 +20,7 @@ export function Footer() {
               </span>
             </Link>
             <p className="text-zinc-600 dark:text-zinc-400 text-sm leading-relaxed max-w-sm">
-              BookNook is a small online library, online. Connect with nearby
+              BookNook is a neighbourhood library, online. Connect with nearby
               readers, borrow beloved books for free, and give every paperback a
               second life.
             </p>
@@ -58,7 +58,7 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  href="/sign-in"
+                  href="/sign-up"
                   className="hover:text-[#22844c] dark:hover:text-[#94d5a5] transition-colors"
                 >
                   Join Community

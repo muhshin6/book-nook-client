@@ -19,7 +19,7 @@ const categories = [
   },
   {
     name: "Science",
-    tagline: "Sci-Fi, fantasy & futuristic worlds",
+    tagline: "Discoveries, nature & the universe",
     count: "180+ Books",
     icon: Sparkles,
     href: "/books?category=Science",
@@ -27,7 +27,7 @@ const categories = [
   },
   {
     name: "History",
-    tagline: "Gripping thrillers, whodunits & dark crimes",
+    tagline: "Civilisations, eras & turning points",
     count: "140+ Books",
     icon: Compass,
     href: "/books?category=History",
@@ -42,7 +42,7 @@ const categories = [
     color: "from-rose-500/10 to-transparent",
   },
   {
-    name: "Other",
+    name: "Others",
     tagline: "Explore our diverse collection of books",
     count: "100+ Books",
     icon: BookText,
