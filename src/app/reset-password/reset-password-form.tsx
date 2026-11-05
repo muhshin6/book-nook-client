@@ -66,7 +66,7 @@ export function ResetPasswordForm({ token }: { token: string }) {
         title: "Password updated",
         description: "Log in with your new password.",
       });
-      router.push("/login");
+      router.push("/sign-in");
       router.refresh();
     } catch (resetError) {
       setError(
@@ -176,7 +176,7 @@ export function ResetPasswordForm({ token }: { token: string }) {
 
       <p className="text-center text-sm text-zinc-600 dark:text-zinc-400">
         <Link
-          href="/login"
+          href="/sign-in"
           className="font-semibold text-[#22844c] hover:underline dark:text-[#94d5a5]"
         >
           Back to login

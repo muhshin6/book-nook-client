@@ -25,8 +25,8 @@ export function getSafeNextPath(
     }
 
     if (
-      url.pathname === "/login" ||
-      url.pathname === "/register" ||
+      url.pathname === "/sign-in" ||
+      url.pathname === "/sign-up" ||
       url.pathname === "/forgot-password" ||
       url.pathname === "/reset-password"
     ) {
@@ -40,5 +40,5 @@ export function getSafeNextPath(
 }
 
 export function buildLoginPath(next: string): string {
-  return `/login?next=${encodeURIComponent(getSafeNextPath(next))}`;
+  return `/sign-in?next=${encodeURIComponent(getSafeNextPath(next))}`;
 }

@@ -91,7 +91,7 @@ export function ForgotPasswordForm() {
           </p>
         </div>
         <Link
-          href="/login"
+          href="/sign-in"
           className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#22844c] hover:underline dark:text-[#94d5a5]"
         >
           <ArrowLeft className="size-4" />
@@ -147,7 +147,7 @@ export function ForgotPasswordForm() {
       <p className="text-center text-sm text-zinc-600 dark:text-zinc-400">
         Remembered your password?{" "}
         <Link
-          href="/login"
+          href="/sign-in"
           className="font-semibold text-[#22844c] hover:underline dark:text-[#94d5a5]"
         >
           Back to login
