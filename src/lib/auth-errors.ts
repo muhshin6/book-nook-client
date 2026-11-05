@@ -34,7 +34,8 @@ export function getAuthErrorMessage(
     case "access_denied":
       return "You denied access to Google. Please try again.";
     case "unauthorized_client":
-      return "Google sign-in redirect URI is not registered. Add http://localhost:3000/api/auth/callback/google to your Google Cloud Console OAuth client's Authorized Redirect URIs.";
+    case "redirect_uri_mismatch":
+      return "Google sign-in redirect URI is not registered. Add your site's callback URL (e.g. https://book-nook-frontend-iota.vercel.app/api/auth/callback/google) to your Google Cloud Console OAuth client's Authorized Redirect URIs.";
     case "invalid_request":
       return "Invalid Google sign-in request. Please try again.";
     case "server_error":

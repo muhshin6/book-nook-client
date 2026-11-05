@@ -16,9 +16,23 @@ if (!process.env.BETTER_AUTH_SECRET) {
   throw new Error("BETTER_AUTH_SECRET is not set.");
 }
 
-if (!process.env.BETTER_AUTH_URL) {
-  throw new Error("BETTER_AUTH_URL is not set.");
-}
+const getAuthBaseUrl = () => {
+  if (
+    process.env.BETTER_AUTH_URL &&
+    !process.env.BETTER_AUTH_URL.includes("localhost")
+  ) {
+    return process.env.BETTER_AUTH_URL;
+  }
+  if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
+    return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
+  }
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+  return process.env.BETTER_AUTH_URL || "http://localhost:3000";
+};
+
+const authBaseURL = getAuthBaseUrl();
 
 // MongoDB connection
 const globalForMongo = globalThis as typeof globalThis & {
@@ -43,7 +57,18 @@ const googleEnabled = Boolean(
 export const auth = betterAuth({
   appName: "BookNook",
 
-  baseURL: process.env.BETTER_AUTH_URL,
+  baseURL: authBaseURL,
+
+  trustedOrigins: [
+    "http://localhost:3000",
+    "https://book-nook-frontend-iota.vercel.app",
+    "https://book-nook-client-sigma.vercel.app",
+    ...(process.env.VERCEL_URL ? [`https://${process.env.VERCEL_URL}`] : []),
+    ...(process.env.VERCEL_PROJECT_PRODUCTION_URL
+      ? [`https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`]
+      : []),
+    ...(process.env.BETTER_AUTH_URL ? [process.env.BETTER_AUTH_URL] : []),
+  ],
 
   secret: process.env.BETTER_AUTH_SECRET,
 
